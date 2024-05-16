@@ -16,7 +16,7 @@ Ce projet est une application de chat en temps réel utilisant Socket.IO, Expres
 
 1. Clonez ce dépôt sur votre machine locale :
     ```bash
-    git clone https://github.com/djah97123/rabbitmq-messaging.git
+    git clone https://github.com/ecabral12/Projet_RabbitMq.git
     ```
 
 2. Accédez au dossier du projet :
