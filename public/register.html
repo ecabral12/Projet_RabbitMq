@@ -1,62 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription</title>
-    <style>
-        /* Vos styles CSS ici */
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Inscription</h2>
-        <form id="register-form">
-            <div class="form-group">
-                <label for="username">Nom d'utilisateur :</label>
-                <input type="text" id="username" name="username" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Mot de passe :</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <div class="form-group">
-                <button type="submit">S'inscrire</button>
-            </div>
-        </form>
-    </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Écouter l'événement de soumission du formulaire d'inscription
-            document.getElementById('register-form').addEventListener('submit', function(event) {
-                // Empêcher le comportement par défaut du formulaire
-                event.preventDefault();
-                // Récupérer les valeurs des champs username et password
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-                // Envoyer les données du formulaire à la route de l'inscription via une requête fetch
-                fetch('/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, password })
-                })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Inscription réussie !');
-                        window.location.href = 'index.html'; // Rediriger vers la page de connexion
-                    } else {
-                        alert('Erreur lors de l\'inscription');
-                    }
-                })
-                .catch(error => {
-                    console.error('Erreur lors de l\'inscription:', error);
-                    alert('Erreur lors de l\'inscription');
-                });
-            });
-        });
-    </script>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inscription</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-image: url("img/mail.png");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    .container {
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      width: 400px;
+    }
+
+    .container h2 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      font-weight: bold;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    .form-group button {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .form-group button.success {
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+    }
+
+    .form-group button.error {
+      background-color: #ffc107;
+      color: #000;
+      border: none;
+    }
+
+    .form-group button:hover {
+      opacity: 0.8;
+    }
+
+    .register-link {
+      text-align: center;
+    }
+
+    .register-link a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    .register-link a:hover {
+      text-decoration: underline;
+    }
+
+    .custom-alert {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+      padding: 15px;
+      border-radius: 5px;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      cursor: pointer;
+    }
+
+    .alert-content {
+      padding: 10px;
+    }
+
+    .success {
+      background-color: #28a745;
+      color: #fff;
+    }
+
+    .error {
+      background-color: #ffc107;
+      color: #000;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>Inscription</h2>
+    <form id="register-form">
+      <div class="form-group">
+        <label for="username">Nom d'utilisateur :</label>
+        <input type="text" id="username" name="username" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Mot de passe :</label>
+        <input type="password" id="password" name="password" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary">S'inscrire</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="custom-alert" class="custom-alert">
+    <span class="close-btn" onclick="closeAlert()">&times;</span>
+    <div class="alert-content">
+      This is a custom alert message.
+    </div>
+  </div>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Écouter l'événement de soumission du formulaire d'inscription
+      document.getElementById('register-form').addEventListener('submit', function (event) {
+        // Empêcher le comportement par défaut du formulaire
+        event.preventDefault();
+        // Récupérer les valeurs des champs username et password
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        // Envoyer les données du formulaire à la route de l'inscription via une requête fetch
+        fetch('/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
+        })
+          .then(response => {
+            if (response.ok) {
+              openAlert('Inscription réussie ✔', 'success');
+              setTimeout(() => {
+                window.location.href = 'index.html';
+              }, 2000);
+            } else {
+              openAlert('Erreur lors de l\'inscription', 'error');
+            }
+          })
+          .catch(error => {
+            console.error('Erreur lors de l\'inscription:', error);
+            openAlert('Erreur lors de l\'inscription', 'error');
+          });
+      });
+    });
+
+    function openAlert(message, type) {
+      const customAlert = document.getElementById('custom-alert');
+      const alertContent = document.querySelector('.alert-content');
+      alertContent.textContent = message;
+      customAlert.classList.remove('success', 'error');
+      customAlert.classList.add(type);
+      customAlert.style.display = 'block';
+    }
+
+    function closeAlert() {
+      const customAlert = document.getElementById('custom-alert');
+      customAlert.style.display = 'none';
+    }
+  </script>
 </body>
+
 </html>
