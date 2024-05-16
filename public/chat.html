@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatBox</title>
+    <script src="https://cdn.socket.io/4.1.2/socket.io.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <ul id="messages"></ul>
+    <input id="m" autocomplete="off" /><button id="sendBtn">Send</button>
+
+
+<script>
+        var socket = io();
+        var user = localStorage.getItem('username');
+
+        $('#sendBtn').click(function(){
+            var message = $('#m').val();
+            if (message.trim() !== '') {
+                if (!user) {
+                    alert('Veuillez vous connecter ou vous inscrire pour envoyer un message');
+                    return;
+                }
+                socket.emit('chat message', {user: user, message: message});
+                $('#m').val('');
+            }
+        });
+
+        socket.on('chat message', function(data){
+            $('#messages').append($('<li>').text(data.user + ' : ' + data.message));
+        });
+    </script>
+</body>
+</html>
