@@ -6,31 +6,110 @@
     <title>ChatBox</title>
     <script src="https://cdn.socket.io/4.1.2/socket.io.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-    <ul id="messages"></ul>
-    <input id="m" autocomplete="off" /><button id="sendBtn">Send</button>
-
-
+<div class="flex h-screen bg-slate-50 overflow-hidden">
+    <aside class="w-1/5 bg-blue-700 p-4" id="users">
+    </aside>
+    <div class="w-4/5 h-screen">
+        <h1 class="text-xl text-center p-4 bg-blue-700 text-white">Discussion</h1>
+        <div class="flex flex-col h-full w-full">
+            <div class="flex-1 overflow-auto p-4 flex flex-col h-5/6"
+                 id="chat">
+            </div>
+            <div class=" h-32 bg-blue-700 p-4 gap-2 justify-between items-center">
+                <input id="m" autocomplete="off" class="w-4/5 p-2 rounded" placeholder="votre message..."/>
+                <button id="sendBtn" class="bg-blue-900 p-2 rounded text-white hover:bg-green-200">Envoyer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--<ul id="messages"></ul>-->
+<!--<input id="m" autocomplete="off"/>-->
+<!--<button id="sendBtn">Send</button>-->
 <script>
-        var socket = io();
-        var user = localStorage.getItem('username');
+    var socket = io();
+    var user = localStorage.getItem('username');
+    var users = [];
+    var chat = [];
 
-        $('#sendBtn').click(function(){
-            var message = $('#m').val();
-            if (message.trim() !== '') {
-                if (!user) {
-                    alert('Veuillez vous connecter ou vous inscrire pour envoyer un message');
-                    return;
-                }
-                socket.emit('chat message', {user: user, message: message});
-                $('#m').val('');
+    function updateUsers() {
+        var usersElement = document.getElementById('users');
+        usersElement.innerHTML = '<h3 class="text-xl text-white text-center ">Utilisateurs dans le chat</h3>'; // Reset the users list
+
+        users.forEach(function (user) {
+            var userDiv = document.createElement('div');
+            var dot = document.createElement('span');
+            userDiv.className = 'user bg-white p-2 m-2 rounded text-dark text-center flex justify-between items-center ';
+            dot.className = 'dot bg-green-500 w-2 h-2 rounded-full';
+            userDiv.textContent = user.charAt(0).toUpperCase() + user.slice(1);
+            usersElement.appendChild(userDiv);
+            userDiv.appendChild(dot);
+
+        });
+    }
+
+    function updateChat(data) {
+        var chatElement = document.getElementById('chat');
+        var chatDiv = document.createElement('div');
+        var chatDivSub = document.createElement('div');
+        var chatP = document.createElement('p');
+        var chatSpanDate = document.createElement('span');
+        var chatSpanUser = document.createElement('span');
+        if (data.user === user) {
+            chatDiv.className = 'mb-2 text-right';
+            chatDivSub.className = 'flex flex-col ';
+            chatP.className = 'bg-blue-500 text-white rounded-lg py-2 px-4 inline-block w-fit self-end max-w-96 break-words';
+        } else {
+            chatDiv.className = 'mb-2';
+            chatDivSub.className = 'flex flex-col ';
+            chatP.className = 'bg-gray-800 text-white rounded-lg py-2 px-4 inline-block w-fit max-w-96 break-words';
+        }
+        chatP.textContent = data.message;
+        chatSpanUser.textContent = data.user.charAt(0).toUpperCase() + data.user.slice(1);
+        chatSpanUser.className = 'text-sm text-gray-500 p-2';
+        chatSpanDate.textContent += ' ' + Intl.DateTimeFormat('fr-FR', {
+            hour: 'numeric',
+            minute: 'numeric'
+        }).format(new Date(data.date));
+        chatSpanDate.className = 'text-xs text-gray-700 p-2';
+        chatElement.appendChild(chatDiv);
+        chatDiv.appendChild(chatDivSub);
+        if (chat[chat.length - 2] && chat[chat.length - 2].user === data.user) {
+            chatSpanUser.textContent = '';
+            chatSpanUser.className = '';
+        }
+
+
+        chatDivSub.appendChild(chatSpanUser);
+        chatDivSub.appendChild(chatP);
+        chatDivSub.appendChild(chatSpanDate);
+
+    }
+
+    $('#sendBtn').click(function () {
+        var message = $('#m').val();
+        if (message.trim() !== '') {
+            if (!user) {
+                alert('Veuillez vous connecter ou vous inscrire pour envoyer un message');
+                return;
             }
-        });
+            socket.emit('chat message', {user: user, message: message, date: new Date()});
+            $('#m').val('');
+        }
+    });
 
-        socket.on('chat message', function(data){
-            $('#messages').append($('<li>').text(data.user + ' : ' + data.message));
-        });
-    </script>
+    socket.on('chat message', function (data) {
+
+        if (users.indexOf(data.user) === -1) {
+            users.push(data.user);
+            updateUsers();
+        }
+        chat.push(data);
+        updateChat(data);
+    });
+
+</script>
 </body>
 </html>
